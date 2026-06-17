@@ -6,7 +6,7 @@ Have you ever pushed a commit to a private project and wished you could see it p
 
 No third-party services, no monthly fees. Just a Cloudflare Worker, a Telegram bot, and about 15 - 20 minutes of your time.
 
-Weblog link: https://medium.com/@mohammadmoosapoor4/from-git-push-to-telegram-building-a-real-time-commit-notifier-with-cloudflare-workers-9fd1b6c14a44
+Blog link: https://medium.com/@mohammadmoosapoor4/from-git-push-to-telegram-building-a-real-time-commit-notifier-with-cloudflare-workers-9fd1b6c14a44
 
 ---
 
