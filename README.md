@@ -55,12 +55,13 @@ Choose the **Hello World** template and hit deploy. You'll land in the editor �
 Replace everything in the editor with the following worker:
 
 ```javascript
+// v2
 export default {
   async fetch(request) {
     // ====== CONFIG — fill these in ======
     const BOT_TOKEN = "YOUR_BOT_TOKEN";
     const CHAT_ID = "YOUR_CHAT_ID";
-    const THREAD_ID = 1063; // remove this line if you're not using a topic/thread
+    // const THREAD_ID = <topic_id>; // uncomment this line if you're using a topic/thread
 
     // Only accept POST requests from GitHub
     if (request.method !== "POST") {
@@ -73,7 +74,7 @@ export default {
     } catch {
       return new Response("Invalid JSON", { status: 400 });
     }
-
+    
     // Route to the correct handler based on the GitHub event type
     const eventType = request.headers.get("x-github-event");
 
@@ -95,9 +96,11 @@ async function handlePush(data, botToken, chatId, threadId) {
 
   if (commits.length === 0) return;
 
-  // Send all commits in parallel
-  await Promise.all(commits.map(commit => {
-    const msg =
+  let msg;
+
+  if (commits.length === 1) {
+    const commit = commits[0];
+    msg =
 `🚀 *New Push*
 
 📦 Repo: ${escMd(repo)}
@@ -107,9 +110,26 @@ async function handlePush(data, botToken, chatId, threadId) {
 📝 Message: ${escMd(truncate(commit.message, 300))}
 ✅ Status: Success
 🔗 [View Commit](${commit.url})`;
+  } else {
+    const commitLines = commits.map((c, i) =>
+      `${i + 1}\\. ${escMd(truncate(c.message, 100))} \\— ${escMd(c.author?.name)}`
+    ).join("\n");
 
-    return sendTelegram(botToken, chatId, threadId, msg);
-  }));
+    msg =
+`🚀 *${escMd(String(commits.length))} Commits Pushed*
+
+📦 Repo: ${escMd(repo)}
+🌿 Branch: ${escMd(branch)}
+🕐 Time: ${escMd(formatDate(commits[commits.length - 1].timestamp))}
+✅ Status: Success
+
+📝 *Commits:*
+${commitLines}
+
+🔗 [View Changes](${data.compare})`;
+  }
+
+  await sendTelegram(botToken, chatId, threadId, msg);
 }
 
 // ====== PULL REQUEST HANDLER ======
@@ -155,15 +175,12 @@ async function sendTelegram(botToken, chatId, threadId, text) {
 }
 
 // ====== HELPERS ======
-
-// Keep only the first line and cut if it's too long
 function truncate(text, max) {
   if (!text) return "";
   const firstLine = text.split("\n")[0];
   return firstLine.length > max ? firstLine.slice(0, max) + "…" : firstLine;
 }
 
-// Format timestamp in a human-readable English format
 function formatDate(iso) {
   if (!iso) return "unknown";
   return new Date(iso).toLocaleString("en-GB", {
@@ -173,7 +190,6 @@ function formatDate(iso) {
   });
 }
 
-// Escape special characters required by Telegram's MarkdownV2
 function escMd(text) {
   if (!text) return "";
   return String(text).replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, "\\$&");
