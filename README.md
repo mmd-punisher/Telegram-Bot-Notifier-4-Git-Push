@@ -55,7 +55,6 @@ Choose the **Hello World** template and hit deploy. You'll land in the editor â€
 Replace everything in the editor with the following worker:
 
 ```javascript
-// v2
 export default {
   async fetch(request) {
     // ====== CONFIG â€” fill these in ======
