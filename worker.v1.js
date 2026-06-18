@@ -3,7 +3,7 @@ export default {
     // ====== CONFIG — fill these in ======
     const BOT_TOKEN = "YOUR_BOT_TOKEN";
     const CHAT_ID = "YOUR_CHAT_ID";
-    const THREAD_ID = 1063; // remove this line if you're not using a topic/thread
+    // const THREAD_ID = <topic_id>; // uncomment this line if you're using a topic/thread
 
     // Only accept POST requests from GitHub
     if (request.method !== "POST") {
