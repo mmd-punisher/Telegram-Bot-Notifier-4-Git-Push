@@ -5,6 +5,7 @@ export default {
     const CHAT_ID = "YOUR_CHAT_ID";
     // const THREAD_ID = <topic_id>; // uncomment this line if you're using a topic/thread
 
+    // Only accept POST requests from GitHub
     if (request.method !== "POST") {
       return new Response("Method Not Allowed", { status: 405 });
     }
@@ -15,7 +16,8 @@ export default {
     } catch {
       return new Response("Invalid JSON", { status: 400 });
     }
-
+    
+    // Route to the correct handler based on the GitHub event type
     const eventType = request.headers.get("x-github-event");
 
     if (eventType === "push") {
